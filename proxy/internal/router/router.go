@@ -2,21 +2,25 @@ package router
 
 import (
 	"fmt"
+	"github.com/go-chi/chi/v5"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"proxy/internal/controller/geo"
 	"strings"
 )
 
-func StRout(cn *controller.GeoHandle) *chi.Mux {
+func StRout(geohand *geo.HandleGeo) *chi.Mux {
 
 	r := chi.NewRouter()
 
 	rp := NewReverseProxy("hugo", "1313")
 	r.Use(rp.ReverseProxy)
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-	r.Post("/api/address/search", cn.SearchHandler)
-	r.Post("/api/address/geocode", cn.GeocodeHandler)
+	//r.Get("/api/register", authhand.Register)
+	r.Post("/api/address/search", geohand.SearchHandle)
+	r.Post("/api/address/geocode", geohand.GeocodeHandle)
 
 	return r
 }
@@ -39,11 +43,11 @@ func (rp *ReverseProxy) ReverseProxy(next http.Handler) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/swagger") {
-			next.ServeHTTP(w, r)
-		} else {
+		if !strings.HasPrefix(r.URL.Path, "/swagger") && !strings.HasPrefix(r.URL.Path, "/api") {
 			proxy.ServeHTTP(w, r)
+			return
 		}
+		next.ServeHTTP(w, r)
 
 	})
 }

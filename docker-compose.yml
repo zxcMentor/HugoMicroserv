@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  hugo:
+    image: klakegg/hugo:0.101.0-ext-alpine
+    container_name: hugoq
+    command: server
+    entrypoint: hugo
+    volumes:
+      - "./hugo:/src"
+    ports:
+      - "1313:1313"
+    networks:
+        - mylocal
+  app:
+    build: ./proxy
+    container_name: proxyq
+    volumes:
+      - "./hugo/content:/app/static"
+    ports:
+      - "8080:8080"
+    networks:
+        - mylocal
+  geo:
+    build: ./geo
+    container_name: geoq
+    networks:
+      - mylocal
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mylocal
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+    mylocal:
+        driver: bridge

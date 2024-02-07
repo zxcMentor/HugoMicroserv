@@ -1,4 +1,17 @@
-FROM ubuntu:latest
-LABEL authors="dima"
+FROM golang:1.19-alpine as builder
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY . .
+
+RUN go mod tidy
+
+RUN go build -o main ./cmd
+
+FROM alpine
+
+COPY --from=builder /app/main /main
+
+EXPOSE 50051
+
+CMD ["/main"]

@@ -3,69 +3,105 @@ package geo
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/redis/go-redis/v9"
-	pb "microservice/geo/protos/gen/go"
+	pbgeo "github.com/zxcMentor/protos/grpcproto/geo/protos/gen/go"
+	"log"
 	"net/http"
-	"time"
+	"proxy/internal/grpc/grpcclient"
 )
 
 type HandleGeo struct {
-	geoClient   pb.GeoServiceClient
+	grpcClient  *grpcclient.ClientGeo
 	redisClient *redis.Client
 }
 
+//добавить конструктор
+
+func NewHandGeo(clientgrpc *grpcclient.ClientGeo) *HandleGeo {
+	redcl := redis.NewClient(&redis.Options{
+		Addr: "redis:6379",
+	})
+
+	return &HandleGeo{
+		grpcClient:  clientgrpc,
+		redisClient: redcl,
+	}
+}
+
 func (h *HandleGeo) SearchHandle(w http.ResponseWriter, r *http.Request) {
-	get := r.Header.Get("Authorization")
-	req := &pb.SearchRequest{}
-
-	err := json.NewDecoder(r.Body).Decode(req)
+	fmt.Println("sear run")
+	req := &pbgeo.SearchRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "err decode json", http.StatusBadRequest)
+		log.Println("err read body")
+		http.Error(w, "Invalid request format", http.StatusBadRequest)
+		return
 	}
+
 	defer r.Body.Close()
-	cachekey := "geo:Search " + req.Input
-	result, err := h.redisClient.Get(context.Background(), cachekey).Result()
-	if err == redis.Nil {
-		address, err := h.geoClient.SearchAddress(context.Background(), req)
-		if err != nil {
-			http.Error(w, "err grpc response", http.StatusInternalServerError)
+	/*
+		cachekey := "geo:Search " + req.Input
+		result, err := h.redisClient.Get(context.Background(), cachekey).Result()
+		if err == redis.Nil {
+
+			address, err := h.grpcClient.CallSearchAddress(context.Background(), req)
+			if err != nil {
+				http.Error(w, "err grpc response", http.StatusInternalServerError)
+				return
+			}
+
+			err = h.redisClient.Set(context.Background(), cachekey, address.Data, time.Hour).Err()
+			if err != nil {
+				http.Error(w, "REDIS SET Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+
+			result = string(address.Data)
+		} else if err != nil {
+			log.Println("err REDIS", err)
 			return
 		}
 
-		jsAddress, err := json.Marshal(address)
+		var cachedAddress pbgeo.SearchResponse
+		err = json.Unmarshal([]byte(result), &cachedAddress)
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			http.Error(w, "err Unmarshal", 0)
 			return
 		}
 
-		err = h.redisClient.Set(context.Background(), cachekey, jsAddress, time.Hour).Err()
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		var res []byte
+		res = cachedAddress.Data
 
-		result = string(jsAddress)
-	} else if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	*/
 
-	var cachedAddress pb.SearchResponse
-	err = json.Unmarshal([]byte(result), &cachedAddress)
+	var resp []byte
+	address, err := h.grpcClient.CallSearchAddress(context.Background(), req)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
+		http.Error(w, "err Call GRPC", http.StatusBadRequest)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(&cachedAddress)
-	if err != nil {
-		http.Error(w, "err encode json", http.StatusBadRequest)
-		return
-	}
+	resp = address.Data
+	w.Write(resp)
 
 }
 
 func (h *HandleGeo) GeocodeHandle(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("geocode run")
+	req := &pbgeo.GeocodeRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		log.Println("err read body")
+		http.Error(w, "Invalid request format", http.StatusBadRequest)
+		return
+	}
 
+	defer r.Body.Close()
+
+	var resp []byte
+	address, err := h.grpcClient.CallGeocodeAddress(context.Background(), req)
+	if err != nil {
+		http.Error(w, "err Call GRPC", http.StatusBadRequest)
+	}
+	resp = address.Data
+	w.Write(resp)
 }
