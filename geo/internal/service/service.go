@@ -30,7 +30,7 @@ func (g *GeoService) GeoSearch(input string) ([]byte, error) {
 		log.Fatal("dadata err request:", err)
 	}
 	defer resp.Body.Close()
-	log.Println("dadata status code - ", resp.StatusCode)
+	log.Println("dadata status code -", resp.StatusCode)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading body: %v", err)
