@@ -2,7 +2,7 @@ package grpcclient
 
 import (
 	"context"
-	pbgeo "github.com/zxcMentor/protos/grpcproto/geo/protos/gen/go"
+	pbgeo "github.com/zxcMentor/grpcproto/protos/geo/gen/go"
 	"google.golang.org/grpc"
 	"log"
 )

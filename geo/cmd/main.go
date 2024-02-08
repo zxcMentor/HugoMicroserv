@@ -17,7 +17,7 @@ func main() {
 	server := grpc.NewServer()
 	pbgeo.RegisterGeoServiceServer(server, &geo.ServerGeo{})
 
-	log.Println("Запуск gRPC сервера...")
+	log.Println("Запуск gRPC сервера geo...")
 	if err := server.Serve(listen); err != nil {
 		log.Fatalf("Ошибка при запуске сервера: %v", err)
 	}

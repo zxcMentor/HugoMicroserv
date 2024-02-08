@@ -1,9 +1,10 @@
 package auth
 
 import (
+	"auth/internal/service"
 	"context"
+	pbauth "github.com/zxcMentor/grpcproto/protos/auth/gen/go"
 	"log"
-	pbauth "microservice/auth/protos/gen/go"
 )
 
 type ServicerAuth interface {
@@ -14,7 +15,7 @@ type ServicerAuth interface {
 
 type ServiceAuth struct {
 	pbauth.UnimplementedAuthServiceServer
-	auths ServicerAuth
+	auths service.AuthService
 }
 
 func (s *ServiceAuth) Register(ctx context.Context, req *pbauth.RegisterRequest) (*pbauth.RegisterResponse, error) {

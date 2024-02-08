@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/redis/go-redis/v9 v9.4.0
 	github.com/swaggo/http-swagger v1.3.4
-	github.com/zxcMentor/protos v0.0.0-20240207141011-b7a93583bb43
+	github.com/zxcMentor/grpcproto v0.0.0-20240207191720-cbf294558a4f
 	google.golang.org/grpc v1.61.0
 )
 

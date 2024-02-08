@@ -5,25 +5,40 @@ import (
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"log"
-	"microservice/user/internal/grpc/user"
-	"microservice/user/internal/repository"
-	"microservice/user/internal/service"
-	pbuser "microservice/user/protos/gen/go"
 	"net"
+	"time"
+	"user/internal/grpc/user"
+	"user/internal/repository"
+	"user/internal/service"
+	pbuser "user/protos/gen/go"
 )
 
 func main() {
 	// Подключение к базе данных
-	db, err := sqlx.Connect("postgres", "user=username dbname=database sslmode=disable")
+	time.Sleep(2 * time.Second)
+	dbHost := "db"
+	dbPort := "5432"
+	dbUser := "userpostgres"
+	dbPassword := "password"
+	dbName := "userserv"
+	sslmode := "disable"
+
+	connectionString := "postgres://" + dbUser + ":" + dbPassword + "@" + dbHost + ":" + dbPort + "/" + dbName + "?sslmode=" + sslmode
+
+	db, err := sqlx.Connect("postgres", connectionString)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Printf("Failed to connect to database: %v", err)
+	}
+
+	if err != nil {
+		log.Fatalf("ping:%v", err)
 	}
 	defer db.Close()
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
-        hashed_password VARCHAR(255) NOT NULL
+        hashepassword VARCHAR(255) NOT NULL
     )`)
 
 	if err != nil {
@@ -37,7 +52,7 @@ func main() {
 	serviceUser := user.NewServiceUser(userService)
 
 	// Создание gRPC сервера
-	lis, err := net.Listen("tcp", "50053")
+	lis, err := net.Listen("tcp", ":50053")
 	if err != nil {
 		log.Fatalf("Failed to listen on port %s: %v", "50053", err)
 	}
@@ -47,7 +62,7 @@ func main() {
 	pbuser.RegisterUserServiceServer(grpcServer, serviceUser)
 
 	// Запуск gRPC сервера
-	log.Printf("Starting gRPC server on port %s", "50053")
+	log.Print("Starting gRPC server user...")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve gRPC server: %v", err)
 	}

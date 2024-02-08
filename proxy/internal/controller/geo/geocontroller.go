@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	pbgeo "github.com/zxcMentor/protos/grpcproto/geo/protos/gen/go"
+	pbgeo "github.com/zxcMentor/grpcproto/protos/geo/gen/go"
 	"log"
 	"net/http"
 	"proxy/internal/grpc/grpcclient"
@@ -16,15 +16,13 @@ type HandleGeo struct {
 	redisClient *redis.Client
 }
 
-//добавить конструктор
-
-func NewHandGeo(clientgrpc *grpcclient.ClientGeo) *HandleGeo {
+func NewHandGeo(clientGeo *grpcclient.ClientGeo) *HandleGeo {
 	redcl := redis.NewClient(&redis.Options{
 		Addr: "redis:6379",
 	})
 
 	return &HandleGeo{
-		grpcClient:  clientgrpc,
+		grpcClient:  clientGeo,
 		redisClient: redcl,
 	}
 }

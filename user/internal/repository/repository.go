@@ -5,7 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
-	"microservice/user/internal/models"
+	"user/internal/models"
 )
 
 type UserRepository interface {

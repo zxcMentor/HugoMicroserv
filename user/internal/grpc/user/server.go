@@ -2,9 +2,9 @@ package user
 
 import (
 	"context"
-	"microservice/user/internal/models"
-	"microservice/user/internal/service"
-	pbuser "microservice/user/protos/gen/go"
+	"user/internal/models"
+	"user/internal/service"
+	pbuser "user/protos/gen/go"
 )
 
 type ServicerUser interface {
@@ -15,7 +15,7 @@ type ServicerUser interface {
 
 type ServiceUser struct {
 	pbuser.UnimplementedUserServiceServer
-	us ServicerUser
+	us *service.UserService
 }
 
 func NewServiceUser(usservice *service.UserService) *ServiceUser {

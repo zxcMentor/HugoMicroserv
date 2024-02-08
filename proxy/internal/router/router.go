@@ -7,18 +7,19 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"proxy/internal/controller/auth"
 	"proxy/internal/controller/geo"
 	"strings"
 )
 
-func StRout(geohand *geo.HandleGeo) *chi.Mux {
+func StRout(geohand *geo.HandleGeo, authhand *auth.HandleAuth) *chi.Mux {
 
 	r := chi.NewRouter()
 
 	rp := NewReverseProxy("hugo", "1313")
 	r.Use(rp.ReverseProxy)
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-	//r.Get("/api/register", authhand.Register)
+	r.Get("/api/register", authhand.Register)
 	r.Post("/api/address/search", geohand.SearchHandle)
 	r.Post("/api/address/geocode", geohand.GeocodeHandle)
 

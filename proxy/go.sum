@@ -56,8 +56,8 @@ github.com/swaggo/http-swagger v1.3.4 h1:q7t/XLx0n15H1Q9/tk3Y9L4n210XzJF5WtnDX64
 github.com/swaggo/http-swagger v1.3.4/go.mod h1:9dAh0unqMBAlbp1uE2Uc2mQTxNMU/ha4UbucIg1MFkQ=
 github.com/swaggo/swag v1.8.1 h1:JuARzFX1Z1njbCGz+ZytBR15TFJwF2Q7fu8puJHhQYI=
 github.com/swaggo/swag v1.8.1/go.mod h1:ugemnJsPZm/kRwFUnzBlbHRd0JY9zE1M4F+uy2pAaPQ=
-github.com/zxcMentor/protos v0.0.0-20240207141011-b7a93583bb43 h1:jT1xJHdu77wUujK3c0UhBWRzJfW5uVIl1xJ1hzuClP8=
-github.com/zxcMentor/protos v0.0.0-20240207141011-b7a93583bb43/go.mod h1:HZj1EF2JNXuNKcUou9Z3/qDYXJiMJPJtbRZo6qENPwo=
+github.com/zxcMentor/grpcproto v0.0.0-20240207191720-cbf294558a4f h1:lAZFsSPbZFdRRqyr4GaLzqGPpHSZDdUzryFVthOBySc=
+github.com/zxcMentor/grpcproto v0.0.0-20240207191720-cbf294558a4f/go.mod h1:p9LFU9X7Bl9c12cI7iXMPOw0kb1vX0c/POHDmoijwEg=
 golang.org/x/mod v0.8.0 h1:LUYupSeNrTNCGzR/hVBk2NHZO4hXcVaW1k4Qx7rjPx8=
 golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/net v0.18.0 h1:mIYleuAkSbHh0tCv7RvjL3F6ZVbLjq4+R7zbOn3Kokg=

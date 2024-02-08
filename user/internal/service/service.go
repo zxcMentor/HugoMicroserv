@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"log"
-	"microservice/user/internal/models"
-	"microservice/user/internal/repository"
+	"user/internal/models"
+	"user/internal/repository"
 )
 
 type UserService struct {
