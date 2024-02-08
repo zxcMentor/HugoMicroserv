@@ -25,8 +25,16 @@ func (u *UserService) CreateUser(email, hashepassword string) (string, error) {
 	return fmt.Sprint("user created successfully"), nil
 }
 
-func (u *UserService) ProfileUser(id int32) (*models.UserDTO, error) {
-	user, err := u.Repo.ProfileUser(id)
+func (u *UserService) CheckUser(email, password string) error {
+	err := u.Repo.CheckUser(email, password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UserService) ProfileUser(email string) (*models.UserDTO, error) {
+	user, err := u.Repo.ProfileUser(email)
 	if err != nil {
 		log.Println("err:", err)
 		return nil, err
@@ -34,7 +42,7 @@ func (u *UserService) ProfileUser(id int32) (*models.UserDTO, error) {
 	return user, nil
 }
 
-func (u *UserService) ListUsers() ([]*models.UserDTO, error) {
+func (u *UserService) ListUsers() ([]models.UserDTO, error) {
 	users, err := u.Repo.ListUsers()
 	if err != nil {
 		log.Println("err:", err)

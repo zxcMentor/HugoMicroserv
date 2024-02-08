@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"user/internal/models"
 )
 
 type UserRepository interface {
 	CreateUser(email, hashepassword string) error
-	ProfileUser(id int32) (*models.UserDTO, error)
-	ListUsers() ([]*models.UserDTO, error)
+	CheckUser(email, password string) error
+	ProfileUser(email string) (*models.UserDTO, error)
+	ListUsers() (*[]models.UserDTO, error)
 }
 
 type UserRepo struct {
@@ -39,24 +41,43 @@ func (u *UserRepo) CreateUser(email, hashepassword string) error {
 
 }
 
-func (u *UserRepo) ProfileUser(id int32) (*models.UserDTO, error) {
-	var user *models.UserDTO
-	query := `SELECT * FROM users WHERE id = $1` //посмотреть как вернуть юзера только с id & email
-	err := u.Postgres.Get(&user, query, id)
+func (u *UserRepo) CheckUser(email, password string) error {
+	var user models.User
+	query := `SELECT id, email, hashepassword FROM users WHERE email = $1`
+	err := u.Postgres.Get(&user, query, email)
+	if err != nil {
+		log.Println("err not found user")
+		return err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.HashePassword), []byte(password))
+	if err != nil {
+		log.Printf("invalid password: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (u *UserRepo) ProfileUser(email string) (*models.UserDTO, error) {
+	var user models.UserDTO
+	query := `SELECT id, email FROM users WHERE email = $1`
+	err := u.Postgres.Get(&user, query, email)
 	if err != nil {
 		log.Println("err user not exist")
 		return nil, err
 	}
-	return user, nil
+
+	return &user, nil
 }
 
-func (u *UserRepo) ListUsers() ([]*models.UserDTO, error) {
-	var users []*models.UserDTO
-	query := `SELECT * FROM users ` //тоже самое как и выше
-	err := u.Postgres.Get(&users, query)
+func (u *UserRepo) ListUsers() ([]models.UserDTO, error) {
+	var users []models.UserDTO
+	query := `SELECT id, email FROM users `
+	err := u.Postgres.Select(&users, query)
 	if err != nil {
 		log.Println("err dont get users")
 		return nil, err
 	}
+
 	return users, nil
 }

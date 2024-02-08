@@ -24,6 +24,21 @@ func (c *ClientUser) CallCreateUser(ctx context.Context, req *pbuser.CreateUserR
 	return res, nil
 }
 
+func (c *ClientUser) CallCheckUser(ctx context.Context, req *pbuser.CheckUserRequest) (*pbuser.CheckUserResponse, error) {
+	conn, err := grpc.Dial("user:50053", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("err connect grpc:", err)
+	}
+
+	client := pbuser.NewUserServiceClient(conn)
+
+	res, err := client.CheckUser(context.Background(), req)
+	if err != nil {
+		log.Fatal("err call grpc")
+	}
+	return res, nil
+}
+
 func (c *ClientUser) CallProfileUser(ctx context.Context, req *pbuser.ProfileUserRequest) (*pbuser.ProfileUserResponse, error) {
 	conn, err := grpc.Dial("user:50053", grpc.WithInsecure())
 	if err != nil {

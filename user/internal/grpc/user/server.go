@@ -9,8 +9,9 @@ import (
 
 type ServicerUser interface {
 	CreateUser(email, password string) (string, error)
-	ProfileUser(id int32) (*models.UserDTO, error)
-	ListUsers() ([]*models.UserDTO, error)
+	CheckUser(email, password string) error
+	ProfileUser(email string) (*models.UserDTO, error)
+	ListUsers() (*[]models.UserDTO, error)
 }
 
 type ServiceUser struct {
@@ -29,8 +30,17 @@ func (s *ServiceUser) CreateUser(ctx context.Context, req *pbuser.CreateUserRequ
 	}
 	return &pbuser.CreateUserResponse{Message: message}, nil
 }
+
+func (s *ServiceUser) CheckUser(ctx context.Context, req *pbuser.CheckUserRequest) (*pbuser.CheckUserResponse, error) {
+	err := s.us.CheckUser(req.Email, req.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &pbuser.CheckUserResponse{}, nil
+}
+
 func (s *ServiceUser) ProfileUser(ctx context.Context, req *pbuser.ProfileUserRequest) (*pbuser.ProfileUserResponse, error) {
-	user, err := s.us.ProfileUser(req.Id)
+	user, err := s.us.ProfileUser(req.Email)
 	if err != nil {
 		return nil, err
 	}

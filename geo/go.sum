@@ -3,6 +3,14 @@ github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
+github.com/zxcMentor/grpcproto v0.0.5 h1:oNf5v5qEvG8cHBMAMfq2TRsvr62qj4PeffRSYubpeZs=
+github.com/zxcMentor/grpcproto v0.0.5/go.mod h1:p9LFU9X7Bl9c12cI7iXMPOw0kb1vX0c/POHDmoijwEg=
+github.com/zxcMentor/grpcproto v0.0.6 h1:qo2JGtEChFb1/lhwOAZBjt+eo7p3Jg7csrj3gqm4IP8=
+github.com/zxcMentor/grpcproto v0.0.6/go.mod h1:p9LFU9X7Bl9c12cI7iXMPOw0kb1vX0c/POHDmoijwEg=
+github.com/zxcMentor/grpcproto v0.0.7 h1:EtjEoYdiUu68HUmcGaEvK2OYqub3e0csZ+dkMg4r7bI=
+github.com/zxcMentor/grpcproto v0.0.7/go.mod h1:p9LFU9X7Bl9c12cI7iXMPOw0kb1vX0c/POHDmoijwEg=
+github.com/zxcMentor/grpcproto v0.0.8 h1:PKr2nYexCksbCXTOWcej3IGLpONnwecORBjZZr4giA4=
+github.com/zxcMentor/grpcproto v0.0.8/go.mod h1:p9LFU9X7Bl9c12cI7iXMPOw0kb1vX0c/POHDmoijwEg=
 golang.org/x/net v0.18.0 h1:mIYleuAkSbHh0tCv7RvjL3F6ZVbLjq4+R7zbOn3Kokg=
 golang.org/x/net v0.18.0/go.mod h1:/czyP5RqHAH4odGYxBJ1qz0+CE5WZ+2j1YgoEo8F2jQ=
 golang.org/x/sys v0.14.0 h1:Vz7Qs629MkJkGyHxUlRHizWJRG2j8fbQKjELVSNhy7Q=

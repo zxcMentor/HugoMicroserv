@@ -9,17 +9,21 @@ import (
 	"net/url"
 	"proxy/internal/controller/auth"
 	"proxy/internal/controller/geo"
+	"proxy/internal/controller/user"
 	"strings"
 )
 
-func StRout(geohand *geo.HandleGeo, authhand *auth.HandleAuth) *chi.Mux {
+func StRout(geohand *geo.HandleGeo, authhand *auth.HandleAuth, userhand *user.HandleUser) *chi.Mux {
 
 	r := chi.NewRouter()
 
 	rp := NewReverseProxy("hugo", "1313")
 	r.Use(rp.ReverseProxy)
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
+	r.Get("/api/login", authhand.Login)
 	r.Get("/api/register", authhand.Register)
+	r.Get("/api/profile", userhand.ProfileUser)
+	r.Get("/api/list", userhand.ListUsers)
 	r.Post("/api/address/search", geohand.SearchHandle)
 	r.Post("/api/address/geocode", geohand.GeocodeHandle)
 

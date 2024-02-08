@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	pbauth "github.com/zxcMentor/grpcproto/protos/auth/gen/go"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 	"net/http"
 	"proxy/internal/grpc/grpcclient"
 )
@@ -16,10 +18,16 @@ func NewHandleAuth(clientAuth *grpcclient.ClientAuth) *HandleAuth {
 }
 
 func (h *HandleAuth) Register(w http.ResponseWriter, r *http.Request) {
+	email := "@example"
+	password := "1234"
+	hashepassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println("err generate hashepassword")
+	}
 
 	req := &pbauth.RegisterRequest{
-		Email:    "@example",
-		Password: "1234",
+		Email:         email,
+		Hashepassword: string(hashepassword),
 	}
 	mess, err := h.clientauth.CallRegister(context.Background(), req)
 	if err != nil {
@@ -32,10 +40,14 @@ func (h *HandleAuth) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandleAuth) Login(w http.ResponseWriter, r *http.Request) {
+	email := "@example"
+	password := "1234"
+
 	req := &pbauth.LoginRequest{
-		Email:    "@example",
-		Password: "1234",
+		Email:    email,
+		Password: password,
 	}
+
 	token, err := h.clientauth.CallLogin(context.Background(), req)
 	if err != nil {
 		http.Error(w, "err register failed", http.StatusInternalServerError)

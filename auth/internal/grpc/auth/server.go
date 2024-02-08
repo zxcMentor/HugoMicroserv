@@ -19,7 +19,7 @@ type ServiceAuth struct {
 }
 
 func (s *ServiceAuth) Register(ctx context.Context, req *pbauth.RegisterRequest) (*pbauth.RegisterResponse, error) {
-	mess, err := s.auths.Register(req.Email, req.Password)
+	mess, err := s.auths.Register(req.Email, req.Hashepassword)
 	if err != nil {
 		log.Println("err:", err)
 		return nil, err

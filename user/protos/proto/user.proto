@@ -8,6 +8,7 @@ service UserService {
   rpc CreateUser(CreateUserRequest)returns(CreateUserResponse){}
   rpc ProfileUser(ProfileUserRequest)returns(ProfileUserResponse){}
   rpc ListUsers(ListUsersRequest)returns(ListUsersResponse){}
+  rpc CheckUser(CheckUserRequest)returns(CheckUserResponse){}
 }
 
 message CreateUserRequest {
@@ -19,7 +20,7 @@ message CreateUserResponse {
 }
 
 message ProfileUserRequest {
-  int32 id = 1;
+  string email = 1;
 }
 message ProfileUserResponse{
   User user = 1;
@@ -32,4 +33,13 @@ message ListUsersResponse{
 message User {
   int32 id = 1;
   string email = 2;
+}
+
+message CheckUserRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message CheckUserResponse{
+
 }
