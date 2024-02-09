@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"proxy/internal/grpc/grpcclient"
+	"time"
 )
 
 type HandleGeo struct {
@@ -38,48 +39,32 @@ func (h *HandleGeo) SearchHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer r.Body.Close()
-	/*
-		cachekey := "geo:Search " + req.Input
-		result, err := h.redisClient.Get(context.Background(), cachekey).Result()
-		if err == redis.Nil {
 
-			address, err := h.grpcClient.CallSearchAddress(context.Background(), req)
-			if err != nil {
-				http.Error(w, "err grpc response", http.StatusInternalServerError)
-				return
-			}
+	cacheKey := fmt.Sprintf("geoSearch: %s", req.Input)
+	data, err := h.redisClient.Get(context.Background(), cacheKey).Result()
+	if err == redis.Nil {
 
-			err = h.redisClient.Set(context.Background(), cachekey, address.Data, time.Hour).Err()
-			if err != nil {
-				http.Error(w, "REDIS SET Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-
-			result = string(address.Data)
-		} else if err != nil {
-			log.Println("err REDIS", err)
-			return
-		}
-
-		var cachedAddress pbgeo.SearchResponse
-		err = json.Unmarshal([]byte(result), &cachedAddress)
+		address, err := h.grpcClient.CallSearchAddress(context.Background(), req)
 		if err != nil {
-			http.Error(w, "err Unmarshal", 0)
+			http.Error(w, "err Call GRPC", http.StatusInternalServerError)
 			return
 		}
 
-		var res []byte
-		res = cachedAddress.Data
+		var addrcache []byte
+		addrcache = address.Data
+		if err != nil {
+			log.Println("adrBts err marsh")
+		}
+		h.redisClient.Set(context.Background(), cacheKey, addrcache, 20*time.Second)
 
-	*/
+		w.Write(addrcache)
+	} else if err != nil {
 
-	var resp []byte
-	address, err := h.grpcClient.CallSearchAddress(context.Background(), req)
-	if err != nil {
-		http.Error(w, "err Call GRPC", http.StatusBadRequest)
+		http.Error(w, "Cache retrieval error", http.StatusInternalServerError)
+	} else {
+
+		w.Write([]byte(data))
 	}
-	resp = address.Data
-	w.Write(resp)
 
 }
 
@@ -95,11 +80,29 @@ func (h *HandleGeo) GeocodeHandle(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	var resp []byte
-	address, err := h.grpcClient.CallGeocodeAddress(context.Background(), req)
-	if err != nil {
-		http.Error(w, "err Call GRPC", http.StatusBadRequest)
+	cacheKey := fmt.Sprintf("geoGeocode: %s %s", req.Lon, req.Lat)
+	data, err := h.redisClient.Get(context.Background(), cacheKey).Result()
+	if err == redis.Nil {
+		// Данных нет в кеше, выполняем запрос к gRPC сервису
+		address, err := h.grpcClient.CallGeocodeAddress(context.Background(), req)
+		if err != nil {
+			http.Error(w, "err Call GRPC", http.StatusInternalServerError)
+			return
+		}
+
+		var addrcache []byte
+		addrcache = address.Data
+		if err != nil {
+			log.Println("adrBts err marsh")
+		}
+		h.redisClient.Set(context.Background(), cacheKey, addrcache, 20*time.Second)
+
+		w.Write(addrcache)
+	} else if err != nil {
+
+		http.Error(w, "Cache retrieval error", http.StatusInternalServerError)
+	} else {
+
+		w.Write([]byte(data))
 	}
-	resp = address.Data
-	w.Write(resp)
 }

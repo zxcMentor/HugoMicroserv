@@ -1,7 +1,7 @@
 package service
 
 import (
-	"auth/internal/grpc/grpccl"
+	"auth/internal/grpc/grpcclients"
 	"context"
 	"github.com/golang-jwt/jwt"
 	pbuser "github.com/zxcMentor/grpcproto/protos/user/gen/go"
@@ -12,7 +12,7 @@ import (
 const SecretKey = "secretkey"
 
 type AuthService struct {
-	clientUser *grpccl.ClientUser
+	clientUser *grpcclients.ClientUser
 }
 
 func (a *AuthService) Register(email, hashepassword string) (string, error) {

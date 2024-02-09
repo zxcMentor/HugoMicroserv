@@ -53,6 +53,7 @@ func (h *HandleAuth) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "err register failed", http.StatusInternalServerError)
 		return
 	}
-
+	w.Header().Set("Authorization", "Bearer "+token.Token)
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(token.Token))
 }

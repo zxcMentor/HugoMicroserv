@@ -1,8 +1,10 @@
 package router
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/golang-jwt/jwt"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"net/http/httputil"
@@ -19,13 +21,18 @@ func StRout(geohand *geo.HandleGeo, authhand *auth.HandleAuth, userhand *user.Ha
 
 	rp := NewReverseProxy("hugo", "1313")
 	r.Use(rp.ReverseProxy)
+
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-	r.Get("/api/login", authhand.Login)
-	r.Get("/api/register", authhand.Register)
-	r.Get("/api/profile", userhand.ProfileUser)
-	r.Get("/api/list", userhand.ListUsers)
-	r.Post("/api/address/search", geohand.SearchHandle)
-	r.Post("/api/address/geocode", geohand.GeocodeHandle)
+	r.Post("/api/login", authhand.Login)
+	r.Post("/api/register", authhand.Register)
+
+	r.Group(func(r chi.Router) {
+		r.Use(TokenValidationMiddleware)
+		r.Get("/api/profile", userhand.ProfileUser)
+		r.Get("/api/list", userhand.ListUsers)
+		r.Post("/api/address/search", geohand.SearchHandle)
+		r.Post("/api/address/geocode", geohand.GeocodeHandle)
+	})
 
 	return r
 }
@@ -54,5 +61,40 @@ func (rp *ReverseProxy) ReverseProxy(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 
+	})
+}
+
+func TokenValidationMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		authHeader := r.Header.Get("Authorization")
+		splitToken := strings.Split(authHeader, " ")
+		if len(splitToken) != 2 || splitToken[0] != "Bearer" {
+			http.Error(w, "Invalid authorization header", http.StatusUnauthorized)
+			return
+		}
+		tokenString := splitToken[1]
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return []byte("secretkey"), nil
+		})
+
+		if err != nil {
+			http.Error(w, "invalid token", http.StatusForbidden)
+			return
+		}
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+
+			ctx := context.WithValue(r.Context(), "claims", claims)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			http.Error(w, "invalid token", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }

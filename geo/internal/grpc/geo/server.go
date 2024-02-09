@@ -3,6 +3,7 @@ package geo
 import (
 	"context"
 	"fmt"
+	"geo/internal/grpc/grpcclients"
 	"geo/internal/service"
 	pbgeo "geo/protos/gen/go"
 )
@@ -14,11 +15,11 @@ type Geo interface {
 
 type ServerGeo struct {
 	pbgeo.UnimplementedGeoServiceServer
+	gcl *grpcclients.ClientAuth
 	geo service.GeoService
 }
 
 func (s *ServerGeo) SearchAddress(context context.Context, req *pbgeo.SearchRequest) (*pbgeo.SearchResponse, error) {
-	//call ItsValid for check token
 
 	address, err := s.geo.GeoSearch(req.Input)
 	if err != nil {
